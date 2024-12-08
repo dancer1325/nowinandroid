@@ -1,56 +1,65 @@
 # Architecture Learning Journey
 
-In this learning journey you will learn about the Now in Android app architecture: its layers, key classes and the interactions between them.
+* goal
+  * learn Android app architecture's
+    * layers,
+    * key classes
+    * interactions between layers -- & -- classes
 
+## App architecture's goals & requirements
 
-## Goals and requirements
-
-The goals for the app architecture are:
-
-
-
-*   Follow the [official architecture guidance](https://developer.android.com/jetpack/guide) as closely as possible.
-*   Easy for developers to understand, nothing too experimental.
-*   Support multiple developers working on the same codebase.
-*   Facilitate local and instrumented tests, both on the developer’s machine and using Continuous Integration (CI).
-*   Minimize build times.
-
+* requirements
+  * follow the [official architecture guidance](https://developer.android.com/jetpack/guide)
+* goal
+  * easy to understand
+  * support MULTIPLE developers / work | SAME codebase
+  * facilitate local & instrumented tests (| developer’s machine & CI)
+  * minimize build times
 
 ## Architecture overview
 
-The app architecture has three layers: a [data layer](https://developer.android.com/jetpack/guide/data-layer), a [domain layer](https://developer.android.com/jetpack/guide/domain-layer) and a [UI layer](https://developer.android.com/jetpack/guide/ui-layer).
-
+* == 3 layers
+  * [data layer](https://developer.android.com/jetpack/guide/data-layer),
+  * [domain layer](https://developer.android.com/jetpack/guide/domain-layer)
+  * [UI layer](https://developer.android.com/jetpack/guide/ui-layer)
 
 <center>
 <img src="images/architecture-1-overall.png" width="600px" alt="Diagram showing overall app architecture" />
 </center>
 
-> [!NOTE]  
-> The official Android architecture is different from other architectures, such as "Clean Architecture". Concepts from other architectures may not apply here, or be applied in different ways. [More discussion here](https://github.com/android/nowinandroid/discussions/1273).
+* Android architecture 👀!= OTHER architectures (_Example:_ "Clean Architecture")👀
+  * see [More discussion here](https://github.com/android/nowinandroid/discussions/1273)
+  * 💡reactive programming model / [unidirectional data flow](https://developer.android.com/jetpack/guide/ui-layer#udf)💡
+    * Reason: 🧠
+      * UI -- reacts to -- changes == Reactive UI
+    * -> Data layer == 1! source of truth
 
-The architecture follows a reactive programming model with [unidirectional data flow](https://developer.android.com/jetpack/guide/ui-layer#udf). With the data layer at the bottom, the key concepts are:
+    ![Architecture / ONLY displays UI & data layers](images/architecture-only-indicating-uianddata-layers.png)
+  * 👀KEY concepts 👀
+    * HIGHER layers -- react to -- changes | lower layers
+    * Events -- flow -- down
+    * Data -- flows -- up
+      * -- via -- [Kotlin Flows](https://developer.android.com/kotlin/flow)
 
+    ![Arhicturecture displaying 2 layers & flow between layers](images/architecture-onlydraw2layers-flow.png)
 
+### Example: Display news | For You screen
 
-*   Higher layers react to changes in lower layers.
-*   Events flow down.
-*   Data flows up.
+* | first run of the app
+  * try to load a list of news resources -- from a -- remote server 
+    * if `prod` build flavor is selected -> `demo` builds -- will use -- local data
+    * steps
 
-The data flow is achieved using streams, implemented using [Kotlin Flows](https://developer.android.com/kotlin/flow).
+    ![flow of news resources to be displayed | For You screen](images/architecture-2-example.png "Diagram showing how news resources are displayed on the For You screen")
 
+* | ALREADY loaded
+  * list of resources -- are shown, based on the -- interests / they chose
 
-### Example: Displaying news on the For You screen
+* easiest way to find the associated code
+  * load the project | Android Studio
+  * search for the text | Code column (handy shortcut: tap <kbd>⇧ SHIFT</kbd> twice)
 
-When the app is first run it will attempt to load a list of news resources from a remote server (when the `prod` build flavor is selected, `demo` builds will use local data). Once loaded, these are shown to the user based on the interests they choose.
-
-The following diagram shows the events which occur and how data flows from the relevant objects to achieve this.
-
-
-![Diagram showing how news resources are displayed on the For You screen](images/architecture-2-example.png "Diagram showing how news resources are displayed on the For You screen")
-
-
-Here's what's happening in each step. The easiest way to find the associated code is to load the project into Android Studio and search for the text in the Code column (handy shortcut: tap <kbd>⇧ SHIFT</kbd> twice).
-
+* TODO:
 
 <table>
   <tr>
@@ -161,10 +170,11 @@ Here's what's happening in each step. The easiest way to find the associated cod
   </tr>
 </table>
 
-
-
 ## Data layer
 
+* == business logic
+* obtain & expose data
+* 
 The data layer is implemented as an offline-first source of app data and business logic. It is the source of truth for all data in the app.
 
 
@@ -262,12 +272,9 @@ Notably, the domain layer in Now in Android _does not_ (for now) contain any use
 
 ## UI Layer
 
-The [UI layer](https://developer.android.com/topic/architecture/ui-layer) comprises:
-
-
-
-*   UI elements built using [Jetpack Compose](https://developer.android.com/jetpack/compose)
-*   [Android ViewModels](https://developer.android.com/topic/libraries/architecture/viewmodel)
+* == UI elements + [Android ViewModels](https://developer.android.com/topic/libraries/architecture/viewmodel)
+  * UI elements -- are built via -- [Jetpack Compose](https://developer.android.com/jetpack/compose)
+* display data
 
 The ViewModels receive streams of data from use cases and repositories, and transforms them into UI state. The UI elements reflect this state, and provide ways for the user to interact with the app. These interactions are passed as events to the ViewModel where they are processed.
 
