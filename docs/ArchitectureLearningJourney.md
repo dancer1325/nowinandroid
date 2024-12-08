@@ -206,18 +206,19 @@
 
 ### Writing data
 
-* TODO:
-* To write data, the repository provides suspend functions. 
-It is up to the caller to ensure that their execution is suitably scoped.
+* if you want to write data -> the repository -- provides -- `suspend` functions
+* their execution is suitably scoped -- based on the -- caller  
 
-_Example: Follow a topic_
-
-Simply call `UserDataRepository.toggleFollowedTopicId` with the ID of the topic the user wishes to follow and `followed=true` to indicate that the topic should be followed (use `false` to unfollow a topic).
+* _Example:_ Follow a topic
+  * call `UserDataRepository.toggleFollowedTopicId` /
+    * ID of the topic / user -- wishes to -- follow
+    * `followed=true`
+      * == topic should be followed
 
 ### Data sources
 
-A repository may depend on one or more data sources. For example, the `OfflineFirstTopicsRepository` depends on the following data sources:
-
+* repository -- may depend on -- >=1 data sources 
+* _Example:_ `OfflineFirstTopicsRepository` -- depends on the -- following data sources
 
 <table>
   <tr>
@@ -233,7 +234,7 @@ A repository may depend on one or more data sources. For example, the `OfflineFi
    </td>
    <td><a href="https://developer.android.com/training/data-storage/room">Room/SQLite</a>
    </td>
-   <td>Persistent relational data associated with Topics
+   <td>Persistent relational data -- associated with -- Topics
    </td>
   </tr>
   <tr>
@@ -241,7 +242,7 @@ A repository may depend on one or more data sources. For example, the `OfflineFi
    </td>
    <td><a href="https://developer.android.com/topic/libraries/architecture/datastore">Proto DataStore</a>
    </td>
-   <td>Persistent unstructured data associated with user preferences, specifically which Topics the user is interested in. This is defined and modeled in a .proto file, using the protobuf syntax.
+   <td>Persistent unstructured data / -- associated with -- user preferences </br> Topics / user is interested in </br> defined -- via -- .proto file
    </td>
   </tr>
   <tr>
@@ -249,22 +250,35 @@ A repository may depend on one or more data sources. For example, the `OfflineFi
    </td>
    <td>Remote API accessed using Retrofit
    </td>
-   <td>Data for topics, provided through REST API endpoints as JSON.
+   <td>Data for topics / -- provided through -- REST API endpoints as JSON
    </td>
   </tr>
 </table>
 
 ### Data synchronization
 
-Repositories are responsible for reconciling data in local storage with remote sources. Once data is obtained from a remote data source it is immediately written to local storage. The  updated data is emitted from local storage (Room) into the relevant data stream and received by any listening clients.
+* repositories
+  * -- are responsible for -- reconciling data | local storage -- with -- remote sources 
+    * ONCE, data -- is obtained from a -- remote data source -> IMMEDIATELY written | local storage 
+* updated data
+  * -- is emitted from -- local storage (Room) | relevant data stream
+  * -- received by -- ANY listening clients
 
-This approach ensures that the read and write concerns of the app are separate and do not interfere with each other.
+* read & write concerns of the app
+  * are separate
+  * NOT interfere with each other
 
-In the case of errors during data synchronization, an exponential backoff strategy is employed. This is delegated to `WorkManager` via the `SyncWorker`, an implementation of the `Synchronizer` interface.
+* if errors happen -> exponential backoff strategy is employed 
+  * -- delegated, via `SyncWorker`, to -- `WorkManager`
 
-See the `OfflineFirstNewsRepository.syncWith` for an example of data synchronization.
+* `SyncWorker`
+  * == implementation of the `Synchronizer` interface
+
+* _Example:_ `OfflineFirstNewsRepository.syncWith`
 
 ## Domain layer
+
+* TODO:
 The [domain layer](https://developer.android.com/topic/architecture/domain-layer) contains use cases. These are classes which have a single invocable method (`operator fun invoke`) containing business logic. 
 
 These use cases are used to simplify and remove duplicate logic from ViewModels. They typically combine and transform data from repositories. 
