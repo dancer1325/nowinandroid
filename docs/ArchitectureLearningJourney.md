@@ -23,9 +23,7 @@
   * [domain layer](https://developer.android.com/jetpack/guide/domain-layer)
   * [UI layer](https://developer.android.com/jetpack/guide/ui-layer)
 
-<center>
 <img src="images/architecture-1-overall.png" width="600px" alt="Diagram showing overall app architecture" />
-</center>
 
 * Android architecture 👀!= OTHER architectures (_Example:_ "Clean Architecture")👀
   * see [More discussion here](https://github.com/android/nowinandroid/discussions/1273)
@@ -48,19 +46,18 @@
 * | first run of the app
   * try to load a list of news resources -- from a -- remote server 
     * if `prod` build flavor is selected -> `demo` builds -- will use -- local data
-    * steps
-
-    ![flow of news resources to be displayed | For You screen](images/architecture-2-example.png "Diagram showing how news resources are displayed on the For You screen")
-
 * | ALREADY loaded
   * list of resources -- are shown, based on the -- interests / they chose
+
+* steps -- to display the -- resources
+
+  ![flow of news resources to be displayed | For You screen](images/architecture-2-example.png)
 
 * easiest way to find the associated code
   * load the project | Android Studio
   * search for the text | Code column (handy shortcut: tap <kbd>⇧ SHIFT</kbd> twice)
 
 * TODO:
-
 <table>
   <tr>
    <td><strong>Step</strong>
@@ -73,7 +70,7 @@
   <tr>
    <td>1
    </td>
-   <td>On app startup, a <a href="https://developer.android.com/topic/libraries/architecture/workmanager">WorkManager</a> job to sync all repositories is enqueued.
+   <td>| app startup, a <a href="https://developer.android.com/topic/libraries/architecture/workmanager">WorkManager</a> job -- sync -- ALL repositories  enqueued
    </td>
    <td><code>Sync.initialize</code>
    </td>
@@ -81,15 +78,15 @@
   <tr>
    <td>2
    </td>
-   <td>The <code>ForYouViewModel</code> calls <code>GetUserNewsResourcesUseCase</code> to obtain a stream of news resources with their bookmarked/saved state. No items will be emitted into this stream until both the user and news repositories emit an item. While waiting, the feed state is set to <code>Loading</code>.
+   <td><code>ForYouViewModel</code> calls <code>GetUserNewsResourcesUseCase</code> -- to obtain a -- stream of NEW resources + their bookmarked/saved state </br> FIRST items -- will be emitted by -- user & news repositories </br>  | waiting, feed state -- is set to -- <code>Loading</code>
    </td>
-   <td>Search for usages of <code>NewsFeedUiState.Loading</code>
+   <td><code>NewsFeedUiState.Loading</code>
    </td>
   </tr>
   <tr>
    <td>3
    </td>
-   <td>The user data repository obtains a stream of <code>UserData</code> objects from a local data source backed by Proto DataStore.
+   <td>user data repository -- obtains a -- stream of <code>UserData</code> objects -- from a -- local data source / backed by Proto DataStore
    </td>
    <td><code>NiaPreferencesDataSource.userData</code>
    </td>
@@ -173,41 +170,49 @@
 ## Data layer
 
 * == business logic
-* obtain & expose data
-* 
-The data layer is implemented as an offline-first source of app data and business logic. It is the source of truth for all data in the app.
+* obtain & expose data /
+  * 👀source of truth for ALL data | app 👀
+* -- implemented as an -- offline-first source of app data & business logic
 
+![data layer architecture](images/architecture-3-data-layer.png)
 
+* OWN models / EACH repository
+  * _Example:_ `Topic` model / `TopicsRepository`,  `NewsResource` model / `NewsRepository`
 
-![Diagram showing the data layer architecture](images/architecture-3-data-layer.png "Diagram showing the data layer architecture")
-
-
-Each repository has its own models. For example, the `TopicsRepository` has a `Topic` model and the `NewsRepository` has a `NewsResource` model.
-
-Repositories are the public API for other layers, they provide the _only_ way to access the app data. The repositories typically offer one or more methods for reading and writing data.
-
+* Repositories
+  * == public API -- for -- OTHER layers
+    * offer >=1 methods -- for -- 
+      * reading data
+      * writing data 
+  * provide
+    * ONLY way -- to access the -- app data
 
 ### Reading data
 
-Data is exposed as data streams. This means each client of the repository must be prepared to react to data changes. Data is not exposed as a snapshot (e.g. `getModel`) because there's no guarantee that it will still be valid by the time it is used.
+* Data -- is exposed as -- data streams
+  * == EACH client of the repository -- MUST be prepared to react to -- data changes 
+  * != snapshot (e.g. `getModel`)
+    * Reason: 🧠NO guarantee that it will still be valid | time / it is used 🧠
 
-Reads are performed from local storage as the source of truth, therefore errors are not expected when reading from `Repository` instances. However, errors may occur when trying to reconcile data in local storage with remote sources. For more on error reconciliation, check the data synchronization section below.
-
-_Example: Read a list of topics_
-
-A list of Topics can be obtained by subscribing to `TopicsRepository::getTopics` flow which emits `List<Topic>`.
-
-Whenever the list of topics changes (for example, when a new topic is added), the updated `List<Topic>` is emitted into the stream.
-
+* Reads
+  * performed -- from -- local storage (== source of truth)
+    * ERRORS
+      * NOT expected | reading -- from -- `Repository` instances
+      * MAY occur | trying to reconcile local storage's data -- with -- remote sources
+        * check [data synchronization](#data-synchronization)
+  * _Example:_
+    * if you subscribe to `TopicsRepository::getTopics` flow / emits `List<Topic>`
+    * if the list of topics changes (_Example:_ NEW topic is added) -> the updated `List<Topic>` is emitted | stream
 
 ### Writing data
 
-To write data, the repository provides suspend functions. It is up to the caller to ensure that their execution is suitably scoped.
+* TODO:
+* To write data, the repository provides suspend functions. 
+It is up to the caller to ensure that their execution is suitably scoped.
 
 _Example: Follow a topic_
 
 Simply call `UserDataRepository.toggleFollowedTopicId` with the ID of the topic the user wishes to follow and `followed=true` to indicate that the topic should be followed (use `false` to unfollow a topic).
-
 
 ### Data sources
 
@@ -248,8 +253,6 @@ A repository may depend on one or more data sources. For example, the `OfflineFi
    </td>
   </tr>
 </table>
-
-
 
 ### Data synchronization
 
