@@ -278,14 +278,24 @@
 
 ## Domain layer
 
-* TODO:
-The [domain layer](https://developer.android.com/topic/architecture/domain-layer) contains use cases. These are classes which have a single invocable method (`operator fun invoke`) containing business logic. 
+* == use cases
+  * ⚠️NOT (for NOW) -- for -- event handling ⚠️
+    * Events -- are handled by the -- UI layer
+      * -- via -- calling repositories' methods
+* uses
+  * simplify
+  * remove duplicate logic -- from -- ViewModels
+  * combine and transform data -- from -- repositories 
+* == classes / have 1! invocable method (`operator fun invoke`) containing business logic 
 
-These use cases are used to simplify and remove duplicate logic from ViewModels. They typically combine and transform data from repositories. 
+* _Example:_ `GetUserNewsResourcesUseCase`
+  * combines a stream `NewsResource`s + stream of `UserData` objects -- to create a -- stream of `UserNewsResource`s
+    * `NewsResource` -- is implemented via -- `Flow`
+    * stream of `UserNewsResource`s
+      * -- is used by -- VARIOUS `ViewModels` / display news resources | screen + their bookmarked state
 
-For example, `GetUserNewsResourcesUseCase` combines a stream (implemented using `Flow`) of `NewsResource`s from a `NewsRepository` with a stream of `UserData` objects from a `UserDataRepository` to create a stream of `UserNewsResource`s. This stream is used by various ViewModels to display news resources on screen with their bookmarked state.  
-
-Notably, the domain layer in Now in Android _does not_ (for now) contain any use cases for event handling. Events are handled by the UI layer calling methods on repositories directly.
+* see
+  * [domain layer](https://developer.android.com/topic/architecture/domain-layer)
 
 ## UI Layer
 
@@ -337,9 +347,7 @@ User actions are communicated from UI elements to ViewModels using regular metho
 
 The `InterestsScreen` takes a lambda expression named `followTopic` which is supplied from `InterestsViewModel.followTopic`. Each time the user taps on a topic to follow this method is called. The ViewModel then processes this action by informing the user data repository.
 
-
 ## Further reading
-
-[Guide to app architecture](https://developer.android.com/topic/architecture)
-
-[Jetpack Compose](https://developer.android.com/jetpack/compose)
+* see
+  * [Guide to app architecture](https://developer.android.com/topic/architecture)
+  * [Jetpack Compose](https://developer.android.com/jetpack/compose)
